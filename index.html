@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SD Study</title>
+  <meta name="description" content="SecureDesk 21-day study program, offline.">
+  <meta name="theme-color" content="#0f766e" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand">SD Study</span>
+      <nav class="tabs" aria-label="Views">
+        <a href="#/" class="tab" data-tab="today">Today</a>
+        <a href="#/all" class="tab" data-tab="all">All days</a>
+      </nav>
+    </div>
+    <div class="progress" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+  </header>
+
+  <div id="update-banner" class="banner" hidden>
+    <span>Update available</span>
+    <button type="button" id="update-reload" class="btn btn-small">Reload</button>
+  </div>
+
+  <main id="app" class="container" tabindex="-1">
+    <p class="muted">Loading…</p>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <input type="file" id="restore-input" accept="application/json,.json" hidden>
+
+  <script src="app.js"></script>
+</body>
+</html>
