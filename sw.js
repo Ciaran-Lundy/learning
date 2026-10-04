@@ -1,5 +1,5 @@
 // Bump this when any precached file changes (including days.json).
-var CACHE = 'sd-v1';
+var CACHE = 'sd-v2';
 
 var ASSETS = [
   './',

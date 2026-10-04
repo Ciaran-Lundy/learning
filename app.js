@@ -168,6 +168,70 @@
     });
   }
 
+  // ---------- Brief rendering ----------
+  // Minimal, DOM-only formatter for the optional `brief` field in days.json:
+  // blank-line separated blocks; "- " and "1. " lists (indented lines nest);
+  // "> " quotes; inline **bold**, `code` and "(verify …)" flags.
+
+  var LIST_RE = /^(\s*)(?:-|\d+\.)\s+(.*)$/;
+
+  function inline(text) {
+    var out = [];
+    text.split(/(\*\*[^*]+\*\*|`[^`]+`|\(verify[^)]*\))/).forEach(function (part) {
+      if (!part) return;
+      if (/^\*\*[^*]+\*\*$/.test(part)) out.push(el('strong', { text: part.slice(2, -2) }));
+      else if (/^`[^`]+`$/.test(part)) out.push(el('code', { text: part.slice(1, -1) }));
+      else if (/^\(verify/.test(part)) out.push(el('span', { class: 'verify', title: 'From training data; check against the resource', text: part }));
+      else out.push(part);
+    });
+    return out;
+  }
+
+  function renderList(lines) {
+    var root = el(/^\s*\d+\./.test(lines[0]) ? 'ol' : 'ul');
+    var lastItem = null;
+    var nested = [];
+    function flushNested() {
+      if (nested.length && lastItem) lastItem.appendChild(renderList(nested));
+      nested = [];
+    }
+    lines.forEach(function (line) {
+      var m = LIST_RE.exec(line);
+      if (m && m[1].length === 0) {
+        flushNested();
+        lastItem = el('li', {}, inline(m[2]));
+        root.appendChild(lastItem);
+      } else if (m) {
+        nested.push(line.replace(/^\s+/, ''));
+      } else if (lastItem) {
+        lastItem.appendChild(document.createTextNode(' '));
+        inline(line.trim()).forEach(function (n) {
+          lastItem.appendChild(typeof n === 'string' ? document.createTextNode(n) : n);
+        });
+      }
+    });
+    flushNested();
+    return root;
+  }
+
+  function renderBrief(text) {
+    var nodes = [];
+    text.split(/\n\s*\n/).forEach(function (block) {
+      var lines = block.split('\n').filter(function (l) { return l.trim(); });
+      if (!lines.length) return;
+      if (lines.every(function (l) { return /^>\s?/.test(l); })) {
+        nodes.push(el('blockquote', {}, [el('p', {}, inline(lines.map(function (l) { return l.replace(/^>\s?/, ''); }).join(' ')))]));
+        return;
+      }
+      var i = 0;
+      var para = [];
+      while (i < lines.length && !LIST_RE.test(lines[i])) para.push(lines[i++]);
+      if (para.length) nodes.push(el('p', {}, inline(para.join(' '))));
+      if (i < lines.length) nodes.push(renderList(lines.slice(i)));
+    });
+    return nodes;
+  }
+
   // ---------- Views ----------
 
   // A single day. `mode` is 'today' (default view) or 'day' (opened from All days).
@@ -233,6 +297,7 @@
       ]),
       el('p', { class: 'count', text: doneCount() + ' of ' + totalDays() + ' days done' }),
       el('section', { class: 'card' }, [el('h2', { text: 'Learn' }), el('p', { text: d.learn })]),
+      d.brief ? el('section', { class: 'card brief' }, [el('h2', { text: 'Brief' })].concat(renderBrief(d.brief))) : null,
       el('section', { class: 'card' }, [
         el('h2', { text: 'Decide' }),
         el('p', { text: d.decide }),
@@ -247,7 +312,7 @@
       children.push(el('p', { class: 'muted', text: 'That was the last day. All ' + totalDays() + ' done.' }));
     }
 
-    app.replaceChildren.apply(app, children);
+    app.replaceChildren.apply(app, children.filter(Boolean));
     window.scrollTo(0, 0);
   }
 

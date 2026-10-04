@@ -273,3 +273,33 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .finished { text-align: center; padding: 32px 8px; }
 .finished h1 { font-size: 26px; margin-bottom: 8px; }
+
+/* Brief */
+.brief p + p, .brief p + ul, .brief p + ol, .brief ul + p, .brief ol + p,
+.brief blockquote + p, .brief p + blockquote { margin-top: 12px; }
+.brief p { margin: 0; }
+.brief ul, .brief ol { margin: 8px 0 0; padding-left: 22px; }
+.brief li { margin: 4px 0; }
+.brief li > ul, .brief li > ol { margin-top: 4px; }
+.brief strong { font-weight: 700; }
+.brief code {
+  font: 0.88em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+  overflow-wrap: anywhere;
+}
+.brief blockquote {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg);
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+}
+.brief .verify {
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--muted);
+}
